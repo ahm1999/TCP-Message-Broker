@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="CustomTCPServer/CustomTCPServer.csproj" />
+  <Project Path="MessageBroker/MessageBroker.csproj" />
+  <Project Path="MessageBrokerClient/MessageBrokerClient.csproj" Id="a215e421-7f71-4356-af35-58ac23f2917c" />
+</Solution>
