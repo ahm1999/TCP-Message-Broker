@@ -26,6 +26,10 @@ namespace MessageBroker
 
                 //Handshake
 
+                await client.WriteAsync($"ClientId = {Guid.NewGuid().ToString()}");
+                
+
+
 
 
                 while (client.Connected)

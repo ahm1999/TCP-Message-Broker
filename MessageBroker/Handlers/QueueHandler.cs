@@ -39,15 +39,15 @@ namespace MessageBroker.Handlers
                     foreach (var client in Clients)
                     {
 
-                        if (!client.Connected)
+                        if (!client.Value.Connected)
                         {
-                            Clients.Remove(client);
+                            Clients.TryRemove(client);
                             continue;
                         }
 
                         if (Queue.Reader.TryRead(out var message))
                         {
-                            await client.WriteAsync(message + "\n");
+                            await client.Value.WriteAsync(message + "\n");
                         }
                         else
                         {

@@ -8,7 +8,7 @@ namespace MessageBroker.Entities
     public class MessagesQueue
     {
 
-        public List<TcpClient> Clients { get; set; } = new List<TcpClient>();
+        public ConcurrentDictionary<string,TcpClient> Clients { get; set; } = new ConcurrentDictionary<string,TcpClient>();
 
         private readonly string _Name;
 

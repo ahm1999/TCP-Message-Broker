@@ -13,6 +13,8 @@ namespace MessageBrokerClient.Entities
         private readonly int Port;
         private readonly IPAddress HostName;
 
+        private string ClientId = string.Empty;
+
         private TcpClient? client;
         public MsgBrokerConnection(string connectionString)
         {
@@ -36,7 +38,7 @@ namespace MessageBrokerClient.Entities
         }
 
 
-        public void Connect() {
+        public async Task Connect() {
 
             if (client is not null)
             {
@@ -44,6 +46,8 @@ namespace MessageBrokerClient.Entities
             }
 
             this.client = new TcpClient(this.HostName.ToString(), Port);
+
+           // await this.client.ConnectAsync();
 
             
         }
@@ -62,7 +66,16 @@ namespace MessageBrokerClient.Entities
             while ((BytesRead = await client.GetStream().ReadAsync(buffer,0,buffer.Length)) > 0) {
 
 
+
+
+
                 string chunk = Encoding.UTF8.GetString(buffer,0,BytesRead);
+
+                if (chunk.Contains("ClientId")) {
+
+                    this.ClientId =  chunk.Split("=")[1].Trim();
+                        
+                }
 
                 await action(chunk);
 
@@ -72,13 +85,32 @@ namespace MessageBrokerClient.Entities
         
         }
 
+        public async Task Unsubscribe(string QueueName) {
+
+            if (this.client is null) throw new Exception("client not connected");
+
+            var request = new
+            {
+                ClientId = this.ClientId,
+                Queue = QueueName,
+                Method = "unsubscribe"
+
+            };
+
+            await client.WriteAsync(JsonSerializer.Serialize(request));
+            await client.WriteAsync("end");
+
+
+
+        }
+
 
 
 
         public async Task Enqueue(string queueName ,List<string> Messages)
         {
 
-            var request = new Request("enqueue", Messages, queueName);
+            var request = new Request("enqueue", Messages, queueName,this.ClientId);
 
             string serializedRequest = JsonSerializer.Serialize(request);
 
@@ -86,6 +118,7 @@ namespace MessageBrokerClient.Entities
 
 
             await this.client.WriteAsync(serializedRequest);
+            await this.client.WriteAsync("end");
 
 
 
@@ -98,17 +131,22 @@ namespace MessageBrokerClient.Entities
 
             var request = new
             {
-
+                ClientId = this.ClientId,
                 Queue = queueName,
                 Method = "dequeue"
 
             };
 
             await client.WriteAsync(JsonSerializer.Serialize(request));
+            await client.WriteAsync("end");
 
 
 
+        }
 
+        public string GetClientId() {
+
+            return this.ClientId;
         }
 
 

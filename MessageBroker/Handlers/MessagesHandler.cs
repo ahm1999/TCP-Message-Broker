@@ -60,10 +60,43 @@ namespace MessageBroker.Handlers
                 return new MessageHandlerDTO(true,Queue:ret_Queue);
 
             }
+            if (Method == RequestMethods.Unsubscribe)
+            {
+
+                await HandleUsubscrbe(ParsedMessage);
+
+                
+            }
+
 
             return new MessageHandlerDTO(false,"no operation specified",string.Empty);
 
 
+        }
+
+        private static async Task HandleUsubscrbe(RequesParserDTO parsedMessage)
+        {
+            var Queues = MessageStorage.Queues;
+
+            Queues.TryGetValue(parsedMessage.Queue, out var messagesQueue);
+
+            if (messagesQueue is null) {
+
+
+                return;
+            
+            }
+            messagesQueue.Clients.TryRemove(parsedMessage.ClientId, out var client);
+
+
+
+
+
+
+
+
+
+            //throw new NotImplementedException();
         }
 
         private static async Task HandleDequeue(RequesParserDTO parsedMessage,TcpClient client)
@@ -82,7 +115,7 @@ namespace MessageBroker.Handlers
                 Queues.TryAdd(parsedMessage.Queue, returnedQueue);
             }
 
-            returnedQueue.Clients.Add(client);
+            returnedQueue.Clients.TryAdd(parsedMessage.ClientId,client);
 
 
             await QueueHandler.Handle(returnedQueue);

@@ -5,7 +5,11 @@ using System.Text.Json.Serialization;
 namespace MessageBroker.Utils
 {
 
-    public record RequesParserDTO(List<string> Messages, List<string> ErrorMessages, string Queue  = "No Queue", RequestMethods Method = RequestMethods.Empty);
+    public record RequesParserDTO(List<string> Messages
+                                ,string ClientId
+                                , string Queue  = "No Queue"
+                                , RequestMethods Method = RequestMethods.Empty
+                                );
 
     public static class RequestParser
     {
@@ -29,8 +33,8 @@ namespace MessageBroker.Utils
 
 
 
-                response = new RequesParserDTO(new List<string>(), new List<string>());
-                response.ErrorMessages.Add("Failed to Desrialize the message");
+                response = new RequesParserDTO(new List<string>(),ClientId:string.Empty);
+                //response.ErrorMessages.Add("Failed to Desrialize the message");
 
 
 
@@ -39,12 +43,7 @@ namespace MessageBroker.Utils
 
 
 
-           // if (response.Messages is null ) { response.ErrorMessages.Add("No messages added");   }
-            if (response.Method == RequestMethods.Empty) { response.ErrorMessages.Add("No Method Specified");   }
-            if (response.Queue == "No Queue") { response.ErrorMessages.Add("No Queue Specified");   }
-
-            //if (response. == RequestMethods.Empty) { response.ErrorMessages.Add("No Method Specified");   }
-
+    
             return response;
 
         }

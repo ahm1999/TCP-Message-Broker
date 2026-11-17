@@ -9,7 +9,9 @@ namespace MessageBroker.Enums
         Empty,
         Enqueue,
         Dequeue,
-        CreateQueue
+        CreateQueue,
+
+        Unsubscribe
 
     }
 }
